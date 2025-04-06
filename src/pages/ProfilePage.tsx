@@ -1,6 +1,7 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { MobileNav } from "@/components/mobile-nav";
-import { Bell, ArrowLeft, User, Shield, Settings, HelpCircle, LogOut, Camera } from "lucide-react";
+import { Bell, ArrowLeft, User, Shield, Settings, HelpCircle, LogOut, Camera, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
@@ -8,17 +9,32 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+
 const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [darkThemeEnabled, setDarkThemeEnabled] = useState(false);
-  const [username, setUsername] = useState("Vastal Agarwal");
-  const [phone, setPhone] = useState("+91 9988998899");
-  const [email, setEmail] = useState("vastalagarwal@gmail.com");
+  const [username, setUsername] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [userId, setUserId] = useState("");
+  const [userRole, setUserRole] = useState<"entrepreneur" | "investor" | "">("");
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Load user data from localStorage
+    const currentUserData = localStorage.getItem("currentUser");
+    if (currentUserData) {
+      const currentUser = JSON.parse(currentUserData);
+      setUsername(currentUser.name || "");
+      setPhone(currentUser.phone || "");
+      setEmail(currentUser.email || "");
+      setUserId(currentUser.id || "RA2311042010058"); // Default ID if not available
+      setUserRole(currentUser.role || "");
+    }
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("isAuthenticated");
     toast({
@@ -27,13 +43,37 @@ const ProfilePage = () => {
     });
     navigate("/");
   };
+
   const handleUpdateProfile = () => {
+    // Save updated profile data to localStorage
+    const currentUserData = localStorage.getItem("currentUser");
+    if (currentUserData) {
+      const currentUser = JSON.parse(currentUserData);
+      currentUser.name = username;
+      currentUser.phone = phone;
+      currentUser.email = email;
+      
+      localStorage.setItem("currentUser", JSON.stringify(currentUser));
+      
+      // Also update in userData if it exists
+      const userData = localStorage.getItem("userData");
+      if (userData) {
+        const user = JSON.parse(userData);
+        if (user.email === currentUser.email) {
+          user.name = username;
+          user.phone = phone;
+          localStorage.setItem("userData", JSON.stringify(user));
+        }
+      }
+    }
+    
     setIsEditing(false);
     toast({
       title: "Profile updated",
       description: "Your profile has been updated successfully."
     });
   };
+
   if (isEditing) {
     return <div className="flex flex-col min-h-screen bg-background pb-16">
         {/* Header */}
@@ -42,10 +82,17 @@ const ProfilePage = () => {
             <ArrowLeft size={20} />
           </Button>
           <h1 className="font-bold text-xl">Edit My Profile</h1>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="text-white" onClick={() => navigate("/insights")}>
+              <Lightbulb size={20} />
+            </Button>
             <Button variant="ghost" size="icon" className="text-white">
               <Bell size={20} />
             </Button>
+            <Avatar className="h-8 w-8 border-2 border-white">
+              <AvatarImage src="/lovable-uploads/f665d69e-32d3-433b-adad-5161bb41ac5d.jpg" alt={username} />
+              <AvatarFallback>{username.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+            </Avatar>
           </div>
         </header>
 
@@ -54,15 +101,16 @@ const ProfilePage = () => {
           <div className="flex flex-col items-center mb-6">
             <div className="relative mb-2">
               <Avatar className="h-20 w-20">
-                <AvatarImage src="/lovable-uploads/958dbc90-1382-49fb-9af7-8548e3970a17.png" alt="Vastal Agarwal" />
-                <AvatarFallback>VA</AvatarFallback>
+                <AvatarImage src="/lovable-uploads/958dbc90-1382-49fb-9af7-8548e3970a17.png" alt={username} />
+                <AvatarFallback>{username.split(' ').map(n => n[0]).join('')}</AvatarFallback>
               </Avatar>
               <Button size="icon" className="absolute bottom-0 right-0 h-6 w-6 rounded-full bg-peerbridge-500 hover:bg-peerbridge-600">
                 <Camera size={12} />
               </Button>
             </div>
-            <h2 className="font-medium">Vastal Agarwal</h2>
-            <p className="text-xs text-muted-foreground">ID: RA2311042010058</p>
+            <h2 className="font-medium">{username}</h2>
+            <p className="text-xs text-muted-foreground">ID: {userId}</p>
+            <p className="text-xs text-muted-foreground capitalize">Role: {userRole}</p>
           </div>
 
           <div className="space-y-6">
@@ -105,6 +153,7 @@ const ProfilePage = () => {
         <MobileNav />
       </div>;
   }
+  
   return <div className="flex flex-col min-h-screen bg-background pb-16">
       {/* Header */}
       <header className="p-4 bg-peerbridge-500 text-white flex items-center">
@@ -112,10 +161,17 @@ const ProfilePage = () => {
           <ArrowLeft size={20} />
         </Button>
         <h1 className="font-bold text-xl">Profile</h1>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
+          <Button variant="ghost" size="icon" className="text-white" onClick={() => navigate("/insights")}>
+            <Lightbulb size={20} />
+          </Button>
           <Button variant="ghost" size="icon" className="text-white">
             <Bell size={20} />
           </Button>
+          <Avatar className="h-8 w-8 border-2 border-white">
+            <AvatarImage src="/lovable-uploads/f665d69e-32d3-433b-adad-5161bb41ac5d.jpg" alt={username} />
+            <AvatarFallback>{username.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+          </Avatar>
         </div>
       </header>
 
@@ -123,11 +179,12 @@ const ProfilePage = () => {
       <main className="flex-1 p-4">
         <div className="flex flex-col items-center mb-8">
           <Avatar className="h-20 w-20 mb-3">
-            <AvatarImage alt="Vastal Agarwal" src="/lovable-uploads/f665d69e-32d3-433b-adad-5161bb41ac5d.jpg" />
-            <AvatarFallback>VA</AvatarFallback>
+            <AvatarImage alt={username} src="/lovable-uploads/f665d69e-32d3-433b-adad-5161bb41ac5d.jpg" />
+            <AvatarFallback>{username.split(' ').map(n => n[0]).join('')}</AvatarFallback>
           </Avatar>
-          <h2 className="font-bold text-xl">Vastal Agarwal</h2>
-          <p className="text-sm text-muted-foreground">ID: RA2311042010058</p>
+          <h2 className="font-bold text-xl">{username}</h2>
+          <p className="text-sm text-muted-foreground">ID: {userId}</p>
+          <p className="text-sm text-muted-foreground capitalize">Role: {userRole}</p>
         </div>
 
         <div className="space-y-4">
@@ -172,4 +229,5 @@ const ProfilePage = () => {
       <MobileNav />
     </div>;
 };
+
 export default ProfilePage;

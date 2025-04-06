@@ -1,14 +1,27 @@
 
-import { Home, Search, ArrowLeftRight, Layers, User } from "lucide-react";
+import { Home, Search, ArrowLeftRight, Layers, User, BarChart2 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 export function MobileNav() {
   const location = useLocation();
+  const [userRole, setUserRole] = useState<"entrepreneur" | "investor" | "">("");
+  
+  useEffect(() => {
+    // Get user role from localStorage
+    const currentUserData = localStorage.getItem("currentUser");
+    if (currentUserData) {
+      const currentUser = JSON.parse(currentUserData);
+      if (currentUser.role) {
+        setUserRole(currentUser.role);
+      }
+    }
+  }, []);
   
   const navItems = [
     {
       name: "Home",
-      href: "/home",
+      href: userRole === "investor" ? "/investor-home" : "/home",
       icon: Home,
     },
     {
@@ -22,14 +35,14 @@ export function MobileNav() {
       icon: ArrowLeftRight,
     },
     {
+      name: "Insights",
+      href: "/insights",
+      icon: BarChart2,
+    },
+    {
       name: "Community",
       href: "/community",
       icon: Layers,
-    },
-    {
-      name: "Profile",
-      href: "/profile",
-      icon: User,
     },
   ];
 

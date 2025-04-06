@@ -13,6 +13,7 @@ interface AuthFormProps {
 }
 
 export function AuthForm({ type }: AuthFormProps) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -34,13 +35,52 @@ export function AuthForm({ type }: AuthFormProps) {
     }
 
     if (type === "login") {
-      // Simulate login success
+      // Retrieve user data if exists
+      const userData = localStorage.getItem("userData");
+      if (userData) {
+        const user = JSON.parse(userData);
+        if (user.email === email) {
+          // Set as authenticated and store current user
+          localStorage.setItem("isAuthenticated", "true");
+          localStorage.setItem("currentUser", JSON.stringify(user));
+          
+          navigate("/home");
+          toast({
+            title: "Welcome back!",
+            description: "You have successfully logged in.",
+          });
+          return;
+        }
+      }
+      
+      // If no match, create a mock user for demo
+      const mockUser = {
+        name: "John Doe",
+        email: email,
+        role: "entrepreneur",
+        phone: "+1 234-567-8901"
+      };
+      
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("currentUser", JSON.stringify(mockUser));
+      
       navigate("/home");
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",
       });
     } else {
+      // For signup, save the user data
+      const newUser = {
+        name: name,
+        email: email,
+        phone: "",
+        role: "" // Will be set during role selection
+      };
+      
+      localStorage.setItem("userData", JSON.stringify(newUser));
+      localStorage.setItem("currentUser", JSON.stringify(newUser));
+      
       // After signup, navigate to user type selection
       navigate("/select-role");
       toast({
@@ -63,8 +103,23 @@ export function AuthForm({ type }: AuthFormProps) {
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-6">
+        {type === "signup" && (
+          <div className="space-y-2">
+            <Label htmlFor="name">Full Name</Label>
+            <Input 
+              id="name"
+              type="text" 
+              placeholder="John Doe"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="bg-muted"
+              required
+            />
+          </div>
+        )}
+        
         <div className="space-y-2">
-          <Label htmlFor="email">Username Or Email</Label>
+          <Label htmlFor="email">Email Address</Label>
           <Input 
             id="email"
             type="email" 

@@ -11,6 +11,26 @@ export function RoleSelection() {
   const navigate = useNavigate();
 
   const handleContinue = () => {
+    if (!selectedRole) return;
+    
+    // Update the current user's role
+    const currentUserData = localStorage.getItem("currentUser");
+    if (currentUserData) {
+      const currentUser = JSON.parse(currentUserData);
+      currentUser.role = selectedRole;
+      
+      // Save back to localStorage
+      localStorage.setItem("currentUser", JSON.stringify(currentUser));
+      
+      // Also update in userData if it exists
+      const userData = localStorage.getItem("userData");
+      if (userData) {
+        const user = JSON.parse(userData);
+        user.role = selectedRole;
+        localStorage.setItem("userData", JSON.stringify(user));
+      }
+    }
+    
     if (selectedRole === "entrepreneur") {
       navigate("/onboarding/entrepreneur");
     } else if (selectedRole === "investor") {

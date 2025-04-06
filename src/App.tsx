@@ -11,6 +11,7 @@ import RoleSelectionPage from "./pages/RoleSelectionPage";
 import EntrepreneurOnboardingPage from "./pages/EntrepreneurOnboardingPage";
 import InvestorOnboardingPage from "./pages/InvestorOnboardingPage";
 import HomePage from "./pages/HomePage";
+import InvestorHomePage from "./pages/InvestorHomePage";
 import ProfilePage from "./pages/ProfilePage";
 import SearchPage from "./pages/SearchPage";
 import ConnectPage from "./pages/ConnectPage";
@@ -18,6 +19,9 @@ import CommunityPage from "./pages/CommunityPage";
 import ChatPage from "./pages/ChatPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import NotFound from "./pages/NotFound";
+import EntrepreneurDetailPage from "./pages/EntrepreneurDetailPage";
+import InvestorDetailPage from "./pages/InvestorDetailPage";
+import InsightsPage from "./pages/InsightsPage";
 
 const queryClient = new QueryClient();
 
@@ -35,12 +39,16 @@ const App = () => (
           <Route path="/onboarding/entrepreneur" element={<EntrepreneurOnboardingPage />} />
           <Route path="/onboarding/investor" element={<InvestorOnboardingPage />} />
           <Route path="/home" element={<HomePage />} />
+          <Route path="/investor-home" element={<InvestorHomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/connect" element={<ConnectPage />} />
           <Route path="/community" element={<CommunityPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/entrepreneur/:id" element={<EntrepreneurDetailPage />} />
+          <Route path="/investor/:id" element={<InvestorDetailPage />} />
+          <Route path="/insights" element={<InsightsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
