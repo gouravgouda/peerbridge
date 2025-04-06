@@ -2,11 +2,12 @@
 import { useState, useEffect } from "react";
 import { MobileNav } from "@/components/mobile-nav";
 import { useParams, useNavigate } from "react-router-dom";
-import { Bell, ArrowLeft, Lightbulb } from "lucide-react";
+import { Bell, ArrowLeft, Lightbulb, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useToast } from "@/components/ui/use-toast";
 
 const mockInvestors = [
   {
@@ -81,6 +82,8 @@ const InvestorDetailPage = () => {
   const [investor, setInvestor] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("weekly");
   const [username, setUsername] = useState("");
+  const [hasRequested, setHasRequested] = useState(false);
+  const { toast } = useToast();
   
   useEffect(() => {
     // Find the investor by ID
@@ -101,6 +104,27 @@ const InvestorDetailPage = () => {
       }
     }
   }, [id]);
+  
+  const handleReachOut = () => {
+    setHasRequested(true);
+    
+    // Store connection request in localStorage
+    const connectionRequests = JSON.parse(localStorage.getItem('connectionRequests') || '[]');
+    connectionRequests.push({
+      id: investor.id,
+      type: 'investor',
+      name: investor.name,
+      entity: investor.investorType,
+      status: 'pending',
+      timestamp: new Date().toISOString(),
+    });
+    localStorage.setItem('connectionRequests', JSON.stringify(connectionRequests));
+    
+    toast({
+      title: "Request Sent",
+      description: `Your connection request to ${investor.name} has been sent.`,
+    });
+  };
   
   if (!investor) {
     return <div>Loading...</div>;
@@ -123,7 +147,7 @@ const InvestorDetailPage = () => {
           </Button>
           <Avatar className="h-8 w-8 border-2 border-white cursor-pointer" onClick={() => navigate("/profile")}>
             <AvatarImage src="/lovable-uploads/f665d69e-32d3-433b-adad-5161bb41ac5d.jpg" alt={username} />
-            <AvatarFallback>{username.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
+            <AvatarFallback>{username ? username.charAt(0) : 'U'}</AvatarFallback>
           </Avatar>
         </div>
       </header>
@@ -242,6 +266,22 @@ const InvestorDetailPage = () => {
             </CardContent>
           </Card>
         </div>
+        
+        {!hasRequested ? (
+          <Button 
+            className="w-full bg-peerbridge-500 hover:bg-peerbridge-600 text-white mt-6"
+            onClick={handleReachOut}
+          >
+            <Send className="h-4 w-4 mr-2" /> Reach Out
+          </Button>
+        ) : (
+          <Button 
+            className="w-full bg-gray-300 text-gray-700 mt-6"
+            disabled
+          >
+            Request Sent
+          </Button>
+        )}
       </main>
 
       {/* Mobile Navigation */}

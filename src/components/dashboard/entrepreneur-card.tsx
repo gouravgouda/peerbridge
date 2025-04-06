@@ -12,13 +12,18 @@ interface EntrepreneurPreviewProps {
     industry: string;
     location?: string;
   };
+  onClick?: () => void;
 }
 
-export function EntrepreneurCard({ entrepreneur }: EntrepreneurPreviewProps) {
+export function EntrepreneurCard({ entrepreneur, onClick }: EntrepreneurPreviewProps) {
   const navigate = useNavigate();
   
   const handleClick = () => {
-    navigate(`/entrepreneur/${entrepreneur.id}`);
+    if (onClick) {
+      onClick();
+    } else {
+      navigate(`/entrepreneur/${entrepreneur.id}`);
+    }
   };
 
   return (

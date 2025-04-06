@@ -3,13 +3,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { InvestorPreview } from "@/types";
+import { useNavigate } from "react-router-dom";
 
 interface InvestorCardProps {
   investor: InvestorPreview;
+  onClick?: () => void;
 }
 
-export function InvestorCard({ investor }: InvestorCardProps) {
-  const { name, image, investorType, preferredIndustries } = investor;
+export function InvestorCard({ investor, onClick }: InvestorCardProps) {
+  const { id, name, image, investorType, preferredIndustries } = investor;
+  const navigate = useNavigate();
   
   const initials = name
     .split(" ")
@@ -17,9 +20,20 @@ export function InvestorCard({ investor }: InvestorCardProps) {
     .join("")
     .toUpperCase()
     .substring(0, 2);
+    
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      navigate(`/investor/${id}`);
+    }
+  };
 
   return (
-    <Card className="overflow-hidden h-full">
+    <Card 
+      className="overflow-hidden h-full cursor-pointer hover:border-peerbridge-300 transition-all"
+      onClick={handleClick}
+    >
       <CardContent className="p-4 flex flex-col items-center text-center">
         <Avatar className="h-16 w-16 mb-2">
           <AvatarImage src={image} alt={name} />
