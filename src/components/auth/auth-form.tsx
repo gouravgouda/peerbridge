@@ -44,7 +44,13 @@ export function AuthForm({ type }: AuthFormProps) {
           localStorage.setItem("isAuthenticated", "true");
           localStorage.setItem("currentUser", JSON.stringify(user));
           
-          navigate("/home");
+          // Direct to the appropriate homepage based on role
+          if (user.role === "investor") {
+            navigate("/investor-home");
+          } else {
+            navigate("/home");
+          }
+          
           toast({
             title: "Welcome back!",
             description: "You have successfully logged in.",
@@ -70,22 +76,33 @@ export function AuthForm({ type }: AuthFormProps) {
         description: "You have successfully logged in.",
       });
     } else {
-      // For signup, save the user data
+      // For signup, get the previously selected role
+      const selectedRole = localStorage.getItem("selectedRole");
+      
+      // Create new user with the selected role
       const newUser = {
         name: name,
         email: email,
         phone: "",
-        role: "" // Will be set during role selection
+        role: selectedRole || ""
       };
       
       localStorage.setItem("userData", JSON.stringify(newUser));
       localStorage.setItem("currentUser", JSON.stringify(newUser));
+      localStorage.setItem("isAuthenticated", "true");
       
-      // After signup, navigate to user type selection
-      navigate("/select-role");
+      // Navigate to the appropriate onboarding page based on role
+      if (selectedRole === "entrepreneur") {
+        navigate("/onboarding/entrepreneur");
+      } else if (selectedRole === "investor") {
+        navigate("/onboarding/investor");
+      } else {
+        navigate("/home");
+      }
+      
       toast({
         title: "Account created!",
-        description: "Please select your role to continue.",
+        description: "Please complete your profile to continue.",
       });
     }
   };
@@ -191,7 +208,7 @@ export function AuthForm({ type }: AuthFormProps) {
         
         {type === "login" ? (
           <div className="text-center text-sm">
-            Don't have an account? <Link to="/signup" className="text-peerbridge-500 hover:underline">Sign Up</Link>
+            Don't have an account? <Link to="/select-role" className="text-peerbridge-500 hover:underline">Sign Up</Link>
           </div>
         ) : (
           <div className="text-center text-sm">

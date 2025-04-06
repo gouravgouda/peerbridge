@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Logo } from "@/components/logo";
@@ -8,7 +9,18 @@ const Index = () => {
     // This simulates checking if the user is already logged in
     const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
     if (isAuthenticated) {
-      navigate("/home");
+      // Check user role to redirect to appropriate homepage
+      const currentUser = localStorage.getItem("currentUser");
+      if (currentUser) {
+        const user = JSON.parse(currentUser);
+        if (user.role === "investor") {
+          navigate("/investor-home");
+        } else {
+          navigate("/home");
+        }
+      } else {
+        navigate("/home");
+      }
     }
   }, [navigate]);
   return <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-peerbridge-50 to-peerbridge-100 p-4">
@@ -28,7 +40,7 @@ const Index = () => {
             Log In
           </Button>
           
-          <Button onClick={() => navigate("/signup")} variant="outline" className="w-full border-peerbridge-200 hover:bg-peerbridge-50" size="lg">
+          <Button onClick={() => navigate("/select-role")} variant="outline" className="w-full border-peerbridge-200 hover:bg-peerbridge-50" size="lg">
             Sign Up
           </Button>
           

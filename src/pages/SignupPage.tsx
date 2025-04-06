@@ -11,6 +11,14 @@ const SignupPage = () => {
     const isAuthenticated = localStorage.getItem("isAuthenticated");
     if (isAuthenticated === "true") {
       navigate("/home");
+      return;
+    }
+    
+    // Check if role was selected
+    const selectedRole = localStorage.getItem("selectedRole");
+    if (!selectedRole) {
+      // If no role is selected, redirect to role selection
+      navigate("/select-role");
     }
   }, [navigate]);
   
